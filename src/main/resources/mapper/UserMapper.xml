@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flab.recipebook.user.domain.dao.UserDao">
+
+    <insert id="save" keyProperty="id" parameterType="com.flab.recipebook.user.domain.User" useGeneratedKeys="true" >
+    /** com.flab.recipebook.user.domain.dao.UserDao*/
+        INSERT INTO USERS (id, user_id, password, email, user_role, create_date, modify_date)
+        VALUES (#{id}, #{userId}, #{password}, #{email}, #{userRole}, #{createDate} , #{modifyDate})
+    </insert>
+</mapper>
