@@ -28,11 +28,11 @@ class UserControllerTest {
         json.put("password", "1008");
         json.put("email", "jm@naver.com");
 
-        mvc.perform(MockMvcRequestBuilders.post("/user")
+        mvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json.toString()))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isCreated())
                 ;
     }
 }
