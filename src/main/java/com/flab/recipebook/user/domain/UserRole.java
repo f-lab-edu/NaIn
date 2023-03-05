@@ -1,4 +1,4 @@
-package com.flab.recipebook.user.dto;
+package com.flab.recipebook.user.domain;
 
 public enum UserRole {
     USER("사용자"),
