@@ -52,6 +52,11 @@ public class User {
         this.userRole = userRole;
     }
 
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
 
-
+    public LocalDateTime getModifyDate() {
+        return modifyDate;
+    }
 }
