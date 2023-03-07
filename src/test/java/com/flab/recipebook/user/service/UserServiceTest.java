@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
