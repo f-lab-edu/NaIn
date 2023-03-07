@@ -1,7 +1,5 @@
 package com.flab.recipebook.user.domain;
 
-import com.flab.recipebook.user.dto.SaveUserDto;
-
 import java.time.LocalDateTime;
 
 public class User {
@@ -13,11 +11,11 @@ public class User {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
-    private User(SaveUserDto saveUserDto) {
-        this.userId = saveUserDto.getUserId();
-        this.password = saveUserDto.getPassword();
-        this.email = saveUserDto.getEmail();
-        this.userRole = UserRole.USER;
+    public User(String userId, String password, String email, UserRole userRole) {
+        this.userId = userId;
+        this.password = password;
+        this.email = email;
+        this.userRole = userRole;
         this.createDate = LocalDateTime.now();
         this.modifyDate = LocalDateTime.now();
     }
@@ -54,8 +52,6 @@ public class User {
         this.userRole = userRole;
     }
 
-    public static User saveUerConvert(SaveUserDto saveUserDto){
-        return new User(saveUserDto);
-    }
+
 
 }

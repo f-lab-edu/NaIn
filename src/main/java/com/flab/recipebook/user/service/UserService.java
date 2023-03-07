@@ -1,6 +1,7 @@
 package com.flab.recipebook.user.service;
 
 import com.flab.recipebook.user.domain.User;
+import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,15 @@ public class UserService {
     }
 
     public void save(SaveUserDto saveUserDto) {
-        userDao.save(createUser(saveUserDto));
+        userDao.save(makeUser(saveUserDto));
     }
 
-    private User createUser(SaveUserDto saveUserDto){
-        User user = User.saveUerConvert(saveUserDto);
-        return user;
+    public User makeUser(SaveUserDto saveUserDto){
+        return new User(
+                saveUserDto.getUserId(),
+                saveUserDto.getPassword(),
+                saveUserDto.getEmail(),
+                UserRole.USER
+        );
     }
 }
