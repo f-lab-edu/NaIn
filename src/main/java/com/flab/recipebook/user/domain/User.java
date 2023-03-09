@@ -3,7 +3,7 @@ package com.flab.recipebook.user.domain;
 import java.time.LocalDateTime;
 
 public class User {
-    private Long id;
+    private Long userNo;
     private String userId;
     private String password;
     private String email;
