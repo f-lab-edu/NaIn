@@ -12,7 +12,7 @@ public class SaveUserDto {
             message = "비밀번호는 영문자, 숫자, 특수기호(!@#$%)가 1개 이상 포함되어야 합니다.")
     private String password;
     @NotBlank(message = "이메일를 입력해주세요")
-    @Email
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
 
     public SaveUserDto(String userId, String password, String email) {

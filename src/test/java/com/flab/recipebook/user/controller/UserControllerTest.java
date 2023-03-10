@@ -15,9 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -25,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -42,7 +39,7 @@ class UserControllerTest {
     @DisplayName("유저 생성 성공시 201 상태코드를 반환한다.")
     void save() throws Exception {
         //given
-        SaveUserDto saveUserDto = new SaveUserDto("yoon", null, "jm@naver.com");
+        SaveUserDto saveUserDto = new SaveUserDto("yoon", "yoon1234!@#", "jm@naver.com");
         String json = new ObjectMapper().writeValueAsString(saveUserDto);
 
         //when
@@ -97,7 +94,7 @@ class UserControllerTest {
         given(userService.findById(userNo)).willReturn(user);
 
         //when
-        mvc.perform(MockMvcRequestBuilders.get("/users/1"))
+        mvc.perform(MockMvcRequestBuilders.get("/users/profile/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         //then

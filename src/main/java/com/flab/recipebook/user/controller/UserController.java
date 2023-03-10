@@ -19,17 +19,16 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<String> saveUser(@RequestBody @Valid SaveUserDto request) {
-            userService.save(request);
-
+        userService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/users/{userNo}")
+    @GetMapping("/users/profile/{userNo}")
     public ResponseEntity<User> findById(@PathVariable Long userNo) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userNo));
     }
 
-    @DeleteMapping("/users/{userNo}")
+    @DeleteMapping("/users/profile/{userNo}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userNo) {
         userService.deleteById(userNo);
         return ResponseEntity.status(HttpStatus.OK).build();

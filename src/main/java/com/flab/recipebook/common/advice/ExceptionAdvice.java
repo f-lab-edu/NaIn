@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 public class ExceptionAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> exceptionMessageBinding(MethodArgumentNotValidException exception){
-        BindingResult bindException = exception.getBindingResult();
-
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST);
@@ -26,6 +24,15 @@ public class ExceptionAdvice {
                 .stream()
                 .collect(Collectors.toMap(c -> c.getField(), e -> e.getDefaultMessage()));
         body.put("errors", errors);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    protected ResponseEntity<Object> RuntimeExceptionMessageBinding(RuntimeException exception){
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("errors", exception.getMessage());
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 }
