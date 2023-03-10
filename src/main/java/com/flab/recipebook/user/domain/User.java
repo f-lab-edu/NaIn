@@ -12,6 +12,13 @@ public class User {
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
+    public User(Long userNo, String password, String email) {
+        this.userNo = userNo;
+        this.password = password;
+        this.email = email;
+        this.modifyDate = LocalDateTime.now();
+    }
+
     public User(String userId, String password, String email, UserRole userRole) {
         this.userId = userId;
         this.password = password;

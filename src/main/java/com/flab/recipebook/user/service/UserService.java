@@ -4,6 +4,7 @@ import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import com.flab.recipebook.user.dto.SaveUserDto;
+import com.flab.recipebook.user.dto.UpdateUserDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,23 +19,18 @@ public class UserService {
     @Transactional
     public void save(SaveUserDto saveUserDto) {
         //id 중복검사
-        if (existUserId(saveUserDto.getUserId())) {
-            throw new IllegalStateException("아이디가 사용중 입니다.");
-        }
+        checkUserId(saveUserDto.getUserId());
         //email 중복검사
-        if (existEmail(saveUserDto.getEmail())) {
-            throw new IllegalStateException("이메일이 사용중 입니다.");
-        }
-        userDao.save(makeUser(saveUserDto));
+        checkEmail(saveUserDto.getEmail());
+        userDao.save(makeUserFromSaveUserDto(saveUserDto));
     }
 
-    public User makeUser(SaveUserDto saveUserDto){
-        return new User(
-                saveUserDto.getUserId(),
-                saveUserDto.getPassword(),
-                saveUserDto.getEmail(),
-                UserRole.USER
-        );
+    public void updateUser(UpdateUserDto updateUserDto) {
+        //현재 패스워드 일치여부
+        checkPassword(updateUserDto);
+        //이메일 체크
+        checkEmail(updateUserDto.getEmail());
+        userDao.update(makeUserFromUpdateUserDto(updateUserDto));
     }
 
     public User findById(Long userNo){
@@ -51,5 +47,46 @@ public class UserService {
 
     public boolean existEmail(String email){
         return userDao.existEmail(email);
+    }
+
+    public User makeUserFromSaveUserDto(SaveUserDto saveUserDto){
+        return new User(
+                saveUserDto.getUserId(),
+                saveUserDto.getPassword(),
+                saveUserDto.getEmail(),
+                UserRole.USER
+        );
+    }
+
+    public User makeUserFromUpdateUserDto(UpdateUserDto updateUserDto){
+        String password = updateUserDto.getModifyPassword();
+
+        if (updateUserDto.getModifyPassword() == null) {
+            password = updateUserDto.getCurrentPassword();
+        }
+
+        return new User(
+                updateUserDto.getUserNo(),
+                password,
+                updateUserDto.getEmail()
+        );
+    }
+    private void checkUserId(String userId){
+        if (existUserId(userId)) {
+            throw new IllegalStateException("아이디가 사용중 입니다.");
+        }
+    }
+    private void checkEmail(String email){
+        if (existEmail(email)) {
+            throw new IllegalStateException("이메일이 사용중 입니다.");
+        }
+    }
+
+    private void checkPassword(UpdateUserDto updateUserDto) {
+        String currentPassword = userDao.findById(updateUserDto.getUserNo()).getPassword();
+
+        if (currentPassword.equals(updateUserDto.getCurrentPassword())) {
+            throw new IllegalStateException("패스워드가 일치하지 않습니다.");
+        }
     }
 }

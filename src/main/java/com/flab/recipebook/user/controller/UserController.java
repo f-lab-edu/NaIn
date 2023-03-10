@@ -2,6 +2,7 @@ package com.flab.recipebook.user.controller;
 
 import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.dto.SaveUserDto;
+import com.flab.recipebook.user.dto.UpdateUserDto;
 import com.flab.recipebook.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,12 @@ public class UserController {
     @DeleteMapping("/users/profile/{userNo}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userNo) {
         userService.deleteById(userNo);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/users/profile")
+    public ResponseEntity<User> updateUser(@Valid @RequestBody UpdateUserDto request) {
+        userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

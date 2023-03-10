@@ -7,7 +7,14 @@
         INSERT INTO USERS (user_no, user_id, password, email, user_role, create_date, modify_date)
         VALUES (#{userNo}, #{userId}, #{password}, #{email}, #{userRole}, #{createDate} , #{modifyDate})
     </insert>
-    
+
+    <update id="update" parameterType="User">
+        UPDATE users
+        set password = #{password},
+            email = #{email}
+        where user_no = #{userNo}
+    </update>
+
     <select id="findById" parameterType="Long" resultType="User">
         SELECT
             user_no,

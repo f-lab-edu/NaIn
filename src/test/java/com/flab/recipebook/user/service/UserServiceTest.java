@@ -4,6 +4,7 @@ import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import com.flab.recipebook.user.dto.SaveUserDto;
+import com.flab.recipebook.user.dto.UpdateUserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ class UserServiceTest {
         SaveUserDto saveUserDto = new SaveUserDto("yoon", "1008", "jm@naver.com");
 
         //when
-        User user = userService.makeUser(saveUserDto);
+        User user = userService.makeUserFromSaveUserDto(saveUserDto);
 
         //then
         assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
@@ -53,5 +54,19 @@ class UserServiceTest {
         //then
         //dao가 호출되었는지 확인
         verify(userDao, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("유저를 수정할 때 modifyPassword 가 null 이면 현재 패스워드가 저장된다.")
+    void notUseModifyPassword(){
+        //given
+        UpdateUserDto updateUserDto = new UpdateUserDto(1L, "current1234!", null, "jm@naver.com");
+
+        //when
+        User user = userService.makeUserFromUpdateUserDto(updateUserDto);
+
+        //then
+        assertThat(user.getPassword()).isEqualTo(updateUserDto.getCurrentPassword());
+        assertThat(user.getPassword()).isNotEqualTo(updateUserDto.getModifyPassword());
     }
 }

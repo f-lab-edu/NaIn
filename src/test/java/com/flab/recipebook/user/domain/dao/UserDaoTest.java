@@ -70,4 +70,23 @@ class UserDaoTest {
         //then
         assertThat(userDao.existEmail("kim@naver.com")).isEqualTo(false);
     }
+
+    @Test
+    @DisplayName("패스워드와 이메일을 변경하면 변경된 값으로 db에 저장된다.")
+    void updateUser(){
+        //given
+        User currentUser = new User(1L, "yoon", "abc1234!@#", "jm@naver.com", UserRole.USER, LocalDateTime.now(), LocalDateTime.now());
+        userDao.save(currentUser);
+
+        User modifyUser = new User(1L, "modify1234!","kim@naver.com");
+
+        //when
+        userDao.update(modifyUser);
+        User resultUser = userDao.findById(1L);
+
+        //then
+        assertThat(resultUser.getPassword()).isEqualTo(modifyUser.getPassword());
+        assertThat(resultUser.getEmail()).isEqualTo(modifyUser.getEmail());
+        assertThat(resultUser.getModifyDate().toLocalDate()).isEqualTo(modifyUser.getModifyDate().toLocalDate());
+    }
 }
