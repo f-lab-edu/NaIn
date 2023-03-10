@@ -17,6 +17,14 @@ public class UserService {
 
     @Transactional
     public void save(SaveUserDto saveUserDto) {
+        //id 중복검사
+        if (existUserId(saveUserDto.getUserId())) {
+            throw new IllegalStateException("아이디가 사용중 입니다.");
+        }
+        //email 중복검사
+        if (existEmail(saveUserDto.getEmail())) {
+            throw new IllegalStateException("이메일이 사용중 입니다.");
+        }
         userDao.save(makeUser(saveUserDto));
     }
 
@@ -35,5 +43,13 @@ public class UserService {
 
     public void deleteById(Long userNo) {
         userDao.deleteById(userNo);
+    }
+
+    public boolean existUserId(String userId){
+        return userDao.existUserId(userId);
+    }
+
+    public boolean existEmail(String email){
+        return userDao.existEmail(email);
     }
 }

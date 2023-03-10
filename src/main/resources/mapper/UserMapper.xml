@@ -21,8 +21,25 @@
         where user_no = #{userNo}
     </select>
 
+    <select id="existUserId" parameterType="String" resultType="boolean">
+        SELECT exists(
+            select 1
+            from users
+            where user_id = #{userid}
+        )
+    </select>
+
+    <select id="existEmail" parameterType="String" resultType="boolean">
+        SELECT exists(
+                       select 1
+                       from users
+                       where email = #{email}
+                   )
+    </select>
+
     <delete id="deleteById" parameterType="Long">
         DELETE from users
             where user_no = #{userNo}
     </delete>
+
 </mapper>
