@@ -1,12 +1,11 @@
 package com.flab.recipebook.user.controller;
 
+import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -23,5 +22,10 @@ public class UserController {
             userService.save(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/users/{userNo}")
+    public ResponseEntity<User> findById(@PathVariable Long userNo) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userNo));
     }
 }

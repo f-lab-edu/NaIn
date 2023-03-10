@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserDao {
     void save(User user);
+    User findById(Long userNo);
 }

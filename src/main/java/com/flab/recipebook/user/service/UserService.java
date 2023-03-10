@@ -28,4 +28,8 @@ public class UserService {
                 UserRole.USER
         );
     }
+
+    public User findById(Long userNo){
+        return userDao.findById(userNo);
+    }
 }
