@@ -28,4 +28,10 @@ public class UserController {
     public ResponseEntity<User> findById(@PathVariable Long userNo) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userNo));
     }
+
+    @DeleteMapping("/users/{userNo}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userNo) {
+        userService.deleteById(userNo);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

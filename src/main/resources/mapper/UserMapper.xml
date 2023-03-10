@@ -20,4 +20,9 @@
         FROM users
         where user_no = #{userNo}
     </select>
+
+    <delete id="deleteById" parameterType="Long">
+        DELETE from users
+            where user_no = #{userNo}
+    </delete>
 </mapper>
