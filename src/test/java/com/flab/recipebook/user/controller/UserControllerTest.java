@@ -81,7 +81,8 @@ class UserControllerTest {
                 Arguments.of("비밀번호가 null인 경우", new SaveUserDto("yoon1",null,"jm@naver.com")),
                 Arguments.of("이메일이 null인 경우", new SaveUserDto("yoon2","ab12345!",null)),
                 Arguments.of("비밀번호가 패턴에 맞지 않는 경우", new SaveUserDto("yoon", "123", "jm@naver.com")),
-                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2","ab12345!","emailError"))
+                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2","ab12345!","emailError")),
+                Arguments.of("여러개의 조건이 맞지 않는 경우", new SaveUserDto(null,null,"emailError"))
         );
     }
 

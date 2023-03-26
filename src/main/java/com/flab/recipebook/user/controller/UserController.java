@@ -1,6 +1,6 @@
 package com.flab.recipebook.user.controller;
 
-import com.flab.recipebook.user.domain.User;
+import com.flab.recipebook.common.dto.ResponseResult;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.dto.UpdateUserDto;
 import com.flab.recipebook.user.service.UserService;
@@ -19,25 +19,25 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<String> saveUser(@RequestBody @Valid SaveUserDto request) {
+    public ResponseEntity<ResponseResult> saveUser(@RequestBody @Valid SaveUserDto request) {
         userService.save(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return new ResponseEntity<>(new ResponseResult(), HttpStatus.CREATED);
     }
 
     @GetMapping("/users/profile/{userNo}")
-    public ResponseEntity<User> findById(@PathVariable Long userNo) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(userNo));
+    public ResponseEntity<ResponseResult> findById(@PathVariable Long userNo) {
+        return new ResponseEntity<>(new ResponseResult(userService.findById(userNo)), HttpStatus.OK);
     }
 
     @DeleteMapping("/users/profile/{userNo}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userNo) {
+    public ResponseEntity<ResponseResult> deleteUser(@PathVariable Long userNo) {
         userService.deleteById(userNo);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return new ResponseEntity<>(new ResponseResult(), HttpStatus.OK);
     }
 
     @PutMapping("/users/profile")
-    public ResponseEntity<User> updateUser(@Valid @RequestBody UpdateUserDto request) {
+    public ResponseEntity<ResponseResult> updateUser(@Valid @RequestBody UpdateUserDto request) {
         userService.updateUser(request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return new ResponseEntity<>(new ResponseResult(), HttpStatus.CREATED);
     }
 }

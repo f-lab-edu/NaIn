@@ -5,6 +5,7 @@ import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.dto.UpdateUserDto;
+import com.flab.recipebook.user.exception.DuplicateValueException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,12 +74,12 @@ public class UserService {
     }
     private void checkUserId(String userId){
         if (existUserId(userId)) {
-            throw new IllegalStateException("아이디가 사용중 입니다.");
+            throw new DuplicateValueException("아이디가 사용중 입니다.");
         }
     }
     private void checkEmail(String email){
         if (existEmail(email)) {
-            throw new IllegalStateException("이메일이 사용중 입니다.");
+            throw new DuplicateValueException("이메일이 사용중 입니다.");
         }
     }
 
