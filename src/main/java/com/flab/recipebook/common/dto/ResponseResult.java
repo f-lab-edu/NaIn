@@ -8,7 +8,7 @@ import java.util.List;
 public class ResponseResult {
     private LocalDateTime timestamp;
 //    private HttpStatus status;
-    private User user;
+    private Object values;
     private List<String> errors;
 
     public ResponseResult() {
@@ -16,10 +16,10 @@ public class ResponseResult {
 //        this.status = status;
     }
 
-    public ResponseResult(User user) {
+    public ResponseResult(Object values) {
         this.timestamp = LocalDateTime.now();
 //        this.status = status;
-        this.user = user;
+        this.values = values;
     }
 
     public ResponseResult(List<String> errors) {
@@ -32,8 +32,8 @@ public class ResponseResult {
         return timestamp;
     }
 
-    public User getUser() {
-        return user;
+    public Object getValues() {
+        return values;
     }
 
     //    public HttpStatus getStatus() {
