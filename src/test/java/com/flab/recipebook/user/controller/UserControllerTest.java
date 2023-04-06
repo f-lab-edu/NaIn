@@ -1,8 +1,8 @@
 package com.flab.recipebook.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.domain.UserRole;
+import com.flab.recipebook.user.dto.ResponseUserDto;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,8 +26,10 @@ import java.util.stream.Stream;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(controllers = UserController.class)
+@WithMockUser(username = "test", roles = "USER")
 class UserControllerTest {
 
     @Autowired
@@ -43,7 +46,8 @@ class UserControllerTest {
         String json = new ObjectMapper().writeValueAsString(saveUserDto);
 
         //when
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post("/users")
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post("/signup")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON));
@@ -63,7 +67,8 @@ class UserControllerTest {
         String json = new ObjectMapper().writeValueAsString(saveUserDto);
 
         //when
-        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post("/users")
+        ResultActions resultActions = mvc.perform(MockMvcRequestBuilders.post("/signup")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON));
@@ -90,7 +95,7 @@ class UserControllerTest {
     @DisplayName("존재하는 유저를 조회 하면 200 상태코드와 User 정보를 반환한다.")
     void findById() throws Exception {
         //given
-        User user = new User(1L,"yoon", "ab12345!","jm@naver.com", UserRole.USER, LocalDateTime.now(),LocalDateTime.now());
+        ResponseUserDto user = new ResponseUserDto(1L,"yoon", "ab12345!","jm@naver.com", UserRole.USER, LocalDateTime.now(),LocalDateTime.now());
         Long userNo = 1L;
         given(userService.findById(userNo)).willReturn(user);
 
