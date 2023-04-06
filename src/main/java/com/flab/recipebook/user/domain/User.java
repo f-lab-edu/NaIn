@@ -11,6 +11,7 @@ public class User {
     private UserRole userRole;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
+    private String refreshToken;
 
     public User(Long userNo, String password, String email) {
         this.userNo = userNo;
@@ -28,7 +29,7 @@ public class User {
         this.modifyDate = LocalDateTime.now();
     }
 
-    public User(Long userNo, String userId, String password, String email, UserRole userRole, LocalDateTime createDate, LocalDateTime modifyDate) {
+    public User(Long userNo, String userId, String password, String email, UserRole userRole, LocalDateTime createDate, LocalDateTime modifyDate, String refreshToken) {
         this.userNo = userNo;
         this.userId = userId;
         this.password = password;
@@ -36,6 +37,12 @@ public class User {
         this.userRole = userRole;
         this.createDate = createDate;
         this.modifyDate = modifyDate;
+        this.refreshToken = refreshToken;
+    }
+
+    //리프레시 토큰을 db에 저장
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public Long getUserNo() {
@@ -80,5 +87,9 @@ public class User {
 
     public LocalDateTime getModifyDate() {
         return modifyDate;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }

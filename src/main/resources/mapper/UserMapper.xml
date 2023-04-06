@@ -4,14 +4,20 @@
 
     <insert id="save" keyProperty="userNo" parameterType="User" useGeneratedKeys="true" >
     /** com.flab.recipebook.user.domain.dao.UserDao*/
-        INSERT INTO USERS (user_no, user_id, password, email, user_role, create_date, modify_date)
-        VALUES (#{userNo}, #{userId}, #{password}, #{email}, #{userRole}, #{createDate} , #{modifyDate})
+        INSERT INTO USERS (user_no, user_id, password, email, user_role, create_date, modify_date, refresh_token)
+        VALUES (#{userNo}, #{userId}, #{password}, #{email}, #{userRole}, #{createDate} , #{modifyDate}, #{refreshToken})
     </insert>
 
     <update id="update" parameterType="User">
         UPDATE users
         set password = #{password},
             email = #{email}
+        where user_no = #{userNo}
+    </update>
+
+    <update id="updateRefreshToken" parameterType="User">
+        UPDATE users
+        set refresh_token = #{refreshToken}
         where user_no = #{userNo}
     </update>
 
@@ -23,9 +29,39 @@
             email,
             user_role,
             create_date,
-            modify_date
+            modify_date,
+            refresh_token
         FROM users
         where user_no = #{userNo}
+    </select>
+
+    <select id="findByUserId" parameterType="String" resultType="User">
+        SELECT
+            user_no,
+            user_id,
+            password,
+            email,
+            user_role,
+            create_date,
+            modify_date,
+            refresh_token
+        FROM users
+        where user_id = #{userId}
+    </select>
+
+    <select id="findByRefreshToken" parameterType="String" resultType="User">
+        SELECT
+            user_no,
+            user_id,
+            password,
+            email,
+            user_role,
+            create_date,
+            modify_date,
+            refresh_token
+        FROM users
+        where refresh_token = #{refreshToken}
+
     </select>
 
     <select id="existUserId" parameterType="String" resultType="boolean">
