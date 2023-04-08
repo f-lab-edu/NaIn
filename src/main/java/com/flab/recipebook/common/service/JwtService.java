@@ -2,6 +2,9 @@ package com.flab.recipebook.common.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +88,7 @@ public class JwtService {
     public Optional<String> getAccessToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(accessHeader))
                 .filter(accessToken -> accessToken.startsWith(BEARER))
-                .map(accessToken -> accessToken.replace(BEARER, ""));   // type Prefix 제거
+                .map(accessToken -> accessToken.replace(BEARER, "").trim());   // type Prefix 제거
     }
 
     /**
@@ -94,7 +97,7 @@ public class JwtService {
     public Optional<String> getRefreshToken(HttpServletRequest request) {
         return Optional.ofNullable(request.getHeader(refreshHeader))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));   // type Prefix 제거
+                .map(refreshToken -> refreshToken.replace(BEARER, "").trim());   // type Prefix 제거
     }
 
     /**
@@ -132,8 +135,8 @@ public class JwtService {
                     .build()
                     .verify(token);
             return true;
-        } catch (Exception e) {
-            return false;
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException(e.getMessage());
         }
     }
 }
