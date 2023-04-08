@@ -3,6 +3,7 @@ package com.flab.recipebook.common.config.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.recipebook.common.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.flab.recipebook.common.filter.JwtAuthenticationProcessingFilter;
+import com.flab.recipebook.common.filter.JwtExceptionFilter;
 import com.flab.recipebook.common.handler.LoginFailHandler;
 import com.flab.recipebook.common.handler.LoginSuccessHandler;
 import com.flab.recipebook.common.service.JwtService;
@@ -54,9 +55,11 @@ public class SecurityConfiguration {
                 //권한 설정
                 .antMatchers("/", "/login", "/signup").permitAll()
                 .anyRequest().authenticated();
-        //순서 설정 LogoutFilter(스프링) -> jwtAuthenticationProcessFilter -> JsonUsernamePasswordAuthenticationFilter
+
+        //순서 설정 LogoutFilter(스프링) -> jwtExceptionFilter -> jwtAuthenticationProcessFilter -> JsonUsernamePasswordAuthenticationFilter
         http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
         http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtExceptionFilter(), JwtAuthenticationProcessingFilter.class);
 
         return http.build();
     }
@@ -110,5 +113,13 @@ public class SecurityConfiguration {
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
         JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter = new JwtAuthenticationProcessingFilter(jwtService, userDao);
         return jwtAuthenticationProcessingFilter;
+    }
+
+    /**
+     * JwtExceptionFilter 등록
+     */
+    @Bean
+    public JwtExceptionFilter jwtExceptionFilter() {
+        return new JwtExceptionFilter(objectMapper);
     }
 }

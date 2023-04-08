@@ -2,6 +2,8 @@ package com.flab.recipebook.common.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import com.flab.recipebook.user.dto.SaveUserDto;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -80,8 +83,8 @@ class JwtServiceTest {
 
         assertThat(jwtService.isValid(accessToken)).isTrue();
         assertThat(jwtService.isValid(refreshToken)).isTrue();
-        assertThat(jwtService.isValid(accessToken + "a")).isFalse();
-        assertThat(jwtService.isValid(refreshToken + "a")).isFalse();
+        assertThatThrownBy(() -> jwtService.isValid(accessToken + "a")).isInstanceOf(JWTVerificationException.class);
+        assertThatThrownBy(() -> jwtService.isValid(refreshToken + "a")).isInstanceOf(JWTVerificationException.class);
     }
 
     @Test
@@ -155,5 +158,4 @@ class JwtServiceTest {
 
         return request;
     }
-
 }
