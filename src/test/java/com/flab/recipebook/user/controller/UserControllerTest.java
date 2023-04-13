@@ -1,6 +1,8 @@
 package com.flab.recipebook.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flab.recipebook.user.domain.User;
+import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +20,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @WebMvcTest(controllers = UserController.class)
 class UserControllerTest {
@@ -33,7 +39,7 @@ class UserControllerTest {
     @DisplayName("유저 생성 성공시 201 상태코드를 반환한다.")
     void save() throws Exception {
         //given
-        SaveUserDto saveUserDto = new SaveUserDto("yoon", null, "jm@naver.com");
+        SaveUserDto saveUserDto = new SaveUserDto("yoon", "yoon1234!@#", "jm@naver.com");
         String json = new ObjectMapper().writeValueAsString(saveUserDto);
 
         //when
@@ -75,7 +81,24 @@ class UserControllerTest {
                 Arguments.of("비밀번호가 null인 경우", new SaveUserDto("yoon1",null,"jm@naver.com")),
                 Arguments.of("이메일이 null인 경우", new SaveUserDto("yoon2","ab12345!",null)),
                 Arguments.of("비밀번호가 패턴에 맞지 않는 경우", new SaveUserDto("yoon", "123", "jm@naver.com")),
-                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2","ab12345!","emailError"))
+                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2","ab12345!","emailError")),
+                Arguments.of("여러개의 조건이 맞지 않는 경우", new SaveUserDto(null,null,"emailError"))
         );
+    }
+
+    @Test
+    @DisplayName("존재하는 유저를 조회 하면 200 상태코드와 User 정보를 반환한다.")
+    void findById() throws Exception {
+        //given
+        User user = new User(1L,"yoon", "ab12345!","jm@naver.com", UserRole.USER, LocalDateTime.now(),LocalDateTime.now());
+        Long userNo = 1L;
+        given(userService.findById(userNo)).willReturn(user);
+
+        //when
+        mvc.perform(MockMvcRequestBuilders.get("/users/profile/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        //then
+        then(userService).should().findById(userNo);
     }
 }
