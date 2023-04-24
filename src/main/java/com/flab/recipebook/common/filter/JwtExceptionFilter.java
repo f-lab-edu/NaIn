@@ -36,7 +36,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         ResponseResult responseResult = getResponseResult(e);
 
         //Json 변환
-        String jsonResult = convertObjectToJson(responseResult);
+        String jsonResult = convertResponseToJson(responseResult);
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
@@ -44,7 +44,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         response.getWriter().write(jsonResult);
     }
 
-    private String convertObjectToJson(ResponseResult responseResult) throws JsonProcessingException {
+    private String convertResponseToJson(ResponseResult responseResult) throws JsonProcessingException {
         return objectMapper.writeValueAsString(responseResult);
     }
 
