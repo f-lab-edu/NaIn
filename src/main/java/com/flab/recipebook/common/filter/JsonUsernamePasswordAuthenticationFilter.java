@@ -34,12 +34,9 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
 
-        //JSON만 필터 처리
-        if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
-            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
-        }
+        validateJson(request.getContentType());
 
-        Map<String, String> userIdPassowordMap = convertJSON(request);
+        Map<String, String> userIdPassowordMap = convertJsonToMap(request);
 
         String username = userIdPassowordMap.get(usernameParameter);
         String password = userIdPassowordMap.get(passwordParameter);
@@ -49,10 +46,16 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 
+    private static void validateJson(String requestContentType) {
+        if (requestContentType == null || !requestContentType.equals(CONTENT_TYPE)) {
+            throw new AuthenticationServiceException("Authentication Content-Type not supported: " + requestContentType);
+        }
+    }
+
     /**
      * request messageBody를 JSON으로 변환
      */
-    private Map<String, String> convertJSON(HttpServletRequest request) throws IOException {
+    private Map<String, String> convertJsonToMap(HttpServletRequest request) throws IOException {
         String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
 
         //Json 변환
