@@ -39,8 +39,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         userDao.findByUserId(userId)
                 .ifPresent(user -> {
-                    user.updateRefreshToken(refreshToken);
-                    userDao.updateRefreshToken(user);
+                    jwtService.updateRefreshToken(user, refreshToken);
                 });
 
         log.info("로그인 성공 userId = {}", userId);

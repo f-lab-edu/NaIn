@@ -2,18 +2,18 @@ package com.flab.recipebook.common.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.domain.dao.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,14 +49,14 @@ public class JwtService {
     /**
      * AccessToken 생성
      */
-     public String createAccessToken(String userId) {
-         Date now = new Date();
-         return JWT.create()
-                 .withSubject(ACCESS_TOKEN_SUBJECT)
-                 .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod))
-                 .withClaim(USER_CLAIM, userId)
-                 .sign(Algorithm.HMAC512(secretKey));
-     }
+    public String createAccessToken(String userId) {
+        Date now = new Date();
+        return JWT.create()
+                .withSubject(ACCESS_TOKEN_SUBJECT)
+                .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod))
+                .withClaim(USER_CLAIM, userId)
+                .sign(Algorithm.HMAC512(secretKey));
+    }
 
     /**
      * RefreshToken 생성
@@ -83,27 +83,18 @@ public class JwtService {
     }
 
     /**
-     * 클라이언트 요청 시 헤더에서 AccessToken 수집
+     * 클라이언트 요청 시 헤더에서 Token 수집
      */
-    public Optional<String> getAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(accessToken -> accessToken.startsWith(BEARER))
-                .map(accessToken -> accessToken.replace(BEARER, "").trim());   // type Prefix 제거
-    }
-
-    /**
-     * 클라이언트 요청 시 헤더에서 RefreshToken 수집
-     */
-    public Optional<String> getRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, "").trim());   // type Prefix 제거
+    public Optional<String> getHeaderToken(String headerToken) {
+        return Optional.ofNullable(headerToken)
+                .filter(token -> token.startsWith(BEARER))
+                .map(token -> token.replace(BEARER, "").trim());   // type Prefix 제거
     }
 
     /**
      * 토근에서 UserId 수집
      */
-    public Optional<String> getUserId(String accessToken){
+    public Optional<String> getUserId(String accessToken) {
         try {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
@@ -116,14 +107,42 @@ public class JwtService {
     }
 
     /**
+     * RefreshToken 재발급
+     */
+    public Map<String, String> ReCreateTokens(String refreshToken) {
+
+        User findUser = checkRefreshToken(refreshToken);
+        Map<String, String> tokens = new HashMap<>();
+
+        if (findUser == null) {
+            throw new JWTVerificationException("RefreshToken 을 찾을 수 없습니다.");
+        }
+
+        String newRefreshToken = createRefreshToken();
+        String newAccessToken = createAccessToken(findUser.getUserId());
+
+        tokens.put(ACCESS_TOKEN_SUBJECT, newAccessToken);
+        tokens.put(REFRESH_TOKEN_SUBJECT, newRefreshToken);
+
+        //새로운 RefreshToken 반영
+        updateRefreshToken(findUser, newRefreshToken);
+
+        return tokens;
+    }
+
+    /**
+     * DB RefreshToken 확인
+     */
+    public User checkRefreshToken(String refreshToken) {
+        return userDao.findByRefreshToken(refreshToken).get();
+    }
+
+    /**
      * RefreshToken DB에 저장을 위한 User 객체 업데이트
      */
-    public void updateRefreshToken(String userId, String refreshToken) {
-        userDao.findByUserId(userId)
-                .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> new Exception("일치하는 회원이 없습니다. ")
-                );
+    public void updateRefreshToken(User user, String refreshToken) {
+        user.updateRefreshToken(refreshToken);
+        userDao.updateRefreshToken(user);
     }
 
     /**

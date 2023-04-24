@@ -2,7 +2,6 @@ package com.flab.recipebook.common.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.flab.recipebook.user.domain.dao.UserDao;
@@ -111,8 +110,9 @@ class JwtServiceTest {
         String refreshToken = jwtService.createRefreshToken();
 
         HttpServletRequest request = setRequest(accessToken, refreshToken);
+        String headerAccessToken = request.getHeader(accessHeader);
 
-        String getAccessToken = jwtService.getAccessToken(request).orElseThrow(() -> new Exception("오류"));
+        String getAccessToken = jwtService.getHeaderToken(headerAccessToken).orElseThrow(() -> new Exception("오류"));
         assertThat(getAccessToken).isEqualTo(accessToken);
         assertThat(JWT.require(Algorithm.HMAC512(secretKey)).build().verify(getAccessToken).getClaim(USER_CLAIM).asString()).isEqualTo(USER_NAME);
     }
@@ -124,8 +124,9 @@ class JwtServiceTest {
         String refreshToken = jwtService.createRefreshToken();
 
         HttpServletRequest request = setRequest(accessToken, refreshToken);
+        String headerRefreshToken = request.getHeader(refreshHeader);
 
-        String getRefreshToken = jwtService.getRefreshToken(request).orElseThrow(() -> new Exception("오류"));
+        String getRefreshToken = jwtService.getHeaderToken(headerRefreshToken).orElseThrow(() -> new Exception("오류"));
 
         assertThat(getRefreshToken).isEqualTo(getRefreshToken);
         assertThat(JWT.require(Algorithm.HMAC512(secretKey)).build().verify(getRefreshToken).getSubject()).isEqualTo(REFRESH_TOKEN_SUBJECT);
@@ -135,9 +136,11 @@ class JwtServiceTest {
     public void getUsername() throws Exception{
         String accessToken = jwtService.createAccessToken(USER_NAME);
         String refreshToken = jwtService.createRefreshToken();
-        HttpServletRequest request = setRequest(accessToken, refreshToken);
 
-        String requestAccessToken = jwtService.getAccessToken(request).orElseThrow(() -> new Exception("토큰 없음"));
+        HttpServletRequest request = setRequest(accessToken, refreshToken);
+        String headerAccessToken = request.getHeader(accessHeader);
+
+        String requestAccessToken = jwtService.getHeaderToken(headerAccessToken).orElseThrow(() -> new Exception("토큰 없음"));
         String getUsername = jwtService.getUserId(requestAccessToken).orElseThrow(() -> new Exception("토큰 없음"));
 
         assertThat(getUsername).isEqualTo(USER_NAME);
