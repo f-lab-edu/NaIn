@@ -80,14 +80,15 @@ class UserControllerTest {
                 .andReturn()
         ;
     }
-    private static Stream<Arguments> nullUserProvider(){
+
+    private static Stream<Arguments> nullUserProvider() {
         return Stream.of(
-                Arguments.of("아이디가 null인 경우", new SaveUserDto(null,"ab12345!","jm@naver.com")),
-                Arguments.of("비밀번호가 null인 경우", new SaveUserDto("yoon1",null,"jm@naver.com")),
-                Arguments.of("이메일이 null인 경우", new SaveUserDto("yoon2","ab12345!",null)),
+                Arguments.of("아이디가 null인 경우", new SaveUserDto(null, "ab12345!", "jm@naver.com")),
+                Arguments.of("비밀번호가 null인 경우", new SaveUserDto("yoon1", null, "jm@naver.com")),
+                Arguments.of("이메일이 null인 경우", new SaveUserDto("yoon2", "ab12345!", null)),
                 Arguments.of("비밀번호가 패턴에 맞지 않는 경우", new SaveUserDto("yoon", "123", "jm@naver.com")),
-                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2","ab12345!","emailError")),
-                Arguments.of("여러개의 조건이 맞지 않는 경우", new SaveUserDto(null,null,"emailError"))
+                Arguments.of("이메일이 패턴에 맞지 않는 경우", new SaveUserDto("yoon2", "ab12345!", "emailError")),
+                Arguments.of("여러개의 조건이 맞지 않는 경우", new SaveUserDto(null, null, "emailError"))
         );
     }
 
@@ -95,7 +96,7 @@ class UserControllerTest {
     @DisplayName("존재하는 유저를 조회 하면 200 상태코드와 User 정보를 반환한다.")
     void findById() throws Exception {
         //given
-        ResponseUserDto user = new ResponseUserDto(1L,"yoon", "ab12345!","jm@naver.com", UserRole.USER, LocalDateTime.now(),LocalDateTime.now());
+        ResponseUserDto user = new ResponseUserDto(1L, "yoon", "ab12345!", "jm@naver.com", UserRole.USER, LocalDateTime.now(), LocalDateTime.now());
         Long userNo = 1L;
         given(userService.findById(userNo)).willReturn(user);
 

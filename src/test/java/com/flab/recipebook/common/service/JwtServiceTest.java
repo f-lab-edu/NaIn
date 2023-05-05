@@ -19,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -94,7 +95,9 @@ class JwtServiceTest {
         String accessToken = jwtService.createAccessToken(USER_NAME);
         String refreshToken = jwtService.createRefreshToken();
 
-        jwtService.setHeaderAccessTokenRefreshToken(response, accessToken, refreshToken);
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader(accessHeader, accessToken);
+        response.setHeader(refreshHeader, refreshToken);
 
         String headerAccessToken = response.getHeader(accessHeader);
         String headerRefreshHeader = response.getHeader(refreshHeader);
@@ -112,7 +115,7 @@ class JwtServiceTest {
         HttpServletRequest request = setRequest(accessToken, refreshToken);
         String headerAccessToken = request.getHeader(accessHeader);
 
-        String getAccessToken = jwtService.getHeaderToken(headerAccessToken).orElseThrow(() -> new Exception("오류"));
+        String getAccessToken = jwtService.removeTokenPrefix(headerAccessToken).orElseThrow(() -> new Exception("오류"));
         assertThat(getAccessToken).isEqualTo(accessToken);
         assertThat(JWT.require(Algorithm.HMAC512(secretKey)).build().verify(getAccessToken).getClaim(USER_CLAIM).asString()).isEqualTo(USER_NAME);
     }
@@ -126,7 +129,7 @@ class JwtServiceTest {
         HttpServletRequest request = setRequest(accessToken, refreshToken);
         String headerRefreshToken = request.getHeader(refreshHeader);
 
-        String getRefreshToken = jwtService.getHeaderToken(headerRefreshToken).orElseThrow(() -> new Exception("오류"));
+        String getRefreshToken = jwtService.removeTokenPrefix(headerRefreshToken).orElseThrow(() -> new Exception("오류"));
 
         assertThat(getRefreshToken).isEqualTo(getRefreshToken);
         assertThat(JWT.require(Algorithm.HMAC512(secretKey)).build().verify(getRefreshToken).getSubject()).isEqualTo(REFRESH_TOKEN_SUBJECT);
@@ -140,8 +143,8 @@ class JwtServiceTest {
         HttpServletRequest request = setRequest(accessToken, refreshToken);
         String headerAccessToken = request.getHeader(accessHeader);
 
-        String requestAccessToken = jwtService.getHeaderToken(headerAccessToken).orElseThrow(() -> new Exception("토큰 없음"));
-        String getUsername = jwtService.getUserId(requestAccessToken).orElseThrow(() -> new Exception("토큰 없음"));
+        String requestAccessToken = jwtService.removeTokenPrefix(headerAccessToken).orElseThrow(() -> new Exception("토큰 없음"));
+        String getUsername = jwtService.getUserId(requestAccessToken);
 
         assertThat(getUsername).isEqualTo(USER_NAME);
     }
@@ -149,7 +152,10 @@ class JwtServiceTest {
 
     private HttpServletRequest setRequest(String accessToken, String refreshToken) {
         MockHttpServletResponse response = new MockHttpServletResponse();
-        jwtService.setHeaderAccessTokenRefreshToken(response, accessToken, refreshToken);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader(accessHeader, accessToken);
+        response.setHeader(refreshHeader, refreshToken);
 
         String headerAccessToken = response.getHeader(accessHeader);
         String headerRefreshToken = response.getHeader(refreshHeader);
