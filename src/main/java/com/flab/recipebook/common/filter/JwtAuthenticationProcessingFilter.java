@@ -2,7 +2,6 @@ package com.flab.recipebook.common.filter;
 
 import com.flab.recipebook.common.service.JwtService;
 import com.flab.recipebook.user.domain.User;
-import com.flab.recipebook.user.domain.dao.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,11 +42,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
     private final JwtService jwtService;
-    private final UserDao userDao;
 
-    public JwtAuthenticationProcessingFilter(JwtService jwtService, UserDao userDao) {
+    public JwtAuthenticationProcessingFilter(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userDao = userDao;
     }
 
     @Override
@@ -61,34 +58,36 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             return;
         }
 
-        String refreshToken = jwtService.getHeaderToken(request.getHeader(refreshHeader))
-                .filter(token -> jwtService.isValid(token))
-                .orElse(null);
+        String refreshToken = jwtService.getHeaderToken(request.getHeader(refreshHeader));
 
         //RefreshToken이 존재하는 경우 (토큰 재발급)
         if (refreshToken != null) {
-            log.info("RefreshToken 존재 : 기존 AccessToken = {}", request.getHeader(accessHeader));
-            log.info("RefreshToken 존재 : 기존 RefreshToken = {}", request.getHeader(refreshHeader));
-
-            //User 검색
+            log.info("RefreshToken 존재 : 요청 AccessToken = {}", request.getHeader(accessHeader));
+            log.info("RefreshToken 존재 : 요청 RefreshToken = {}", request.getHeader(refreshHeader));
 
             //Token 재발급
             Map<String, String> tokens = jwtService.ReCreateTokens(refreshToken);
 
             //응답 반영
-            jwtService.setHeaderAccessTokenRefreshToken(response, tokens.get(ACCESS_TOKEN_SUBJECT), tokens.get(REFRESH_TOKEN_SUBJECT));
+            String ReCreatedAccessToken = tokens.get(ACCESS_TOKEN_SUBJECT);
+            String ReCreatedRefreshToken = tokens.get(REFRESH_TOKEN_SUBJECT);
+
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setHeader(accessHeader, ReCreatedAccessToken);
+            response.setHeader(refreshHeader, ReCreatedRefreshToken);
+
+            log.info("발급된 AccessToken = {}", ReCreatedAccessToken);
+            log.info("발급된 RefreshToken = {}", ReCreatedRefreshToken);
             return;
         }
 
         //RefreshToken 이 없고, AcessToken 이 유효한 경우
         if (refreshToken == null) {
             log.info("AccessToken 요청 : {}", request.getHeader(accessHeader));
-            //요청에서 AccessToken 검증
-            jwtService.getHeaderToken(request.getHeader(accessHeader))
-                    .filter(accessToken -> jwtService.isValid(accessToken))
-                    .ifPresent(accessToken -> jwtService.getUserId(accessToken)
-                            .ifPresent(userId -> userDao.findByUserId(userId)
-                                    .ifPresent(user -> saveAuthentication(user))));
+
+            //요청에서 AccessToken 검증 후 userId 추출
+            String userId = jwtService.extractUserId(request.getHeader(accessHeader));
+            jwtService.checkUserId(userId).ifPresent(user -> saveAuthentication(user));
 
             filterChain.doFilter(request, response);
         }

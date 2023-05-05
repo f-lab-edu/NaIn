@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class JwtService {
     private String accessHeader;
 
     @Value("${jwt.refresh.expiration}")
-    private Long refreshTokenExpirationPerios;
+    private Long refreshTokenExpirationPeriod;
 
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
@@ -65,44 +64,40 @@ public class JwtService {
         Date now = new Date();
         return JWT.create()
                 .withSubject(REFRESH_TOKEN_SUBJECT)
-                .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPerios))
+                .withExpiresAt(new Date(now.getTime() + refreshTokenExpirationPeriod))
                 .sign(Algorithm.HMAC512(secretKey));
-    }
-
-    /**
-     * AccessToken, RefreshToken 발급
-     * 로그인 시 헤더에 AccessToken, RefreshToken 추가
-     */
-    public void setHeaderAccessTokenRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, refreshToken);
-
-        log.info("AccessToken = {}", accessToken);
-        log.info("RefreshToken = {}", refreshToken);
     }
 
     /**
      * 클라이언트 요청 시 헤더에서 Token 수집
      */
-    public Optional<String> getHeaderToken(String headerToken) {
+    public String getHeaderToken(String headerToken) {
+        return removeTokenPrefix(headerToken)
+                .filter(this::isValid)
+                .orElse(null);
+    }
+
+    /**
+     * 토큰의 prefix 제거
+     */
+    public Optional<String> removeTokenPrefix(String headerToken) {
         return Optional.ofNullable(headerToken)
                 .filter(token -> token.startsWith(BEARER))
-                .map(token -> token.replace(BEARER, "").trim());   // type Prefix 제거
+                .map(token -> token.replace(BEARER, "").trim());     // type Prefix 제거
     }
 
     /**
      * 토근에서 UserId 수집
      */
-    public Optional<String> getUserId(String accessToken) {
+    public String getUserId(String accessToken) {
         try {
-            return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
+            return JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
                     .verify(accessToken)    //토근 검증, 오류 시 -> 예외발생
                     .getClaim(USER_CLAIM)
-                    .asString());
+                    .asString();
         } catch (Exception e) {
-            return Optional.empty();
+            throw new JWTVerificationException(e.getMessage());
         }
     }
 
@@ -113,10 +108,6 @@ public class JwtService {
 
         User findUser = checkRefreshToken(refreshToken);
         Map<String, String> tokens = new HashMap<>();
-
-        if (findUser == null) {
-            throw new JWTVerificationException("RefreshToken 을 찾을 수 없습니다.");
-        }
 
         String newRefreshToken = createRefreshToken();
         String newAccessToken = createAccessToken(findUser.getUserId());
@@ -134,7 +125,7 @@ public class JwtService {
      * DB RefreshToken 확인
      */
     public User checkRefreshToken(String refreshToken) {
-        return userDao.findByRefreshToken(refreshToken).get();
+        return userDao.findByRefreshToken(refreshToken).orElseThrow(() -> new JWTVerificationException("RefreshToken 을 찾을 수 없습니다."));
     }
 
     /**
@@ -157,5 +148,20 @@ public class JwtService {
         } catch (JWTVerificationException e) {
             throw new JWTVerificationException(e.getMessage());
         }
+    }
+
+    /**
+     * 토큰에서 userId 추출 
+     */
+    public String extractUserId(String headerToken) {
+        String token = removeTokenPrefix(headerToken).orElse(null);
+        return getUserId(token);
+    }
+
+    /**
+     * userId Db 조회
+     */
+    public Optional<User> checkUserId(String userId) {
+        return userDao.findByUserId(userId);
     }
 }

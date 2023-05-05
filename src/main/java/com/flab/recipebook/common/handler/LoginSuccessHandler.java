@@ -1,7 +1,6 @@
 package com.flab.recipebook.common.handler;
 
 import com.flab.recipebook.common.service.JwtService;
-import com.flab.recipebook.user.domain.dao.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,15 +16,19 @@ import java.io.IOException;
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private Logger log = LoggerFactory.getLogger(getClass());
 
+    @Value("${jwt.access.header}")
+    private String accessHeader;
+
+    @Value("${jwt.refresh.header}")
+    private String refreshHeader;
+
     @Value("${jwt.access.expiration}")
     private String accessTokenExpiration;
 
     private final JwtService jwtService;
-    private final UserDao userDao;
 
-    public LoginSuccessHandler(JwtService jwtService, UserDao userDao) {
+    public LoginSuccessHandler(JwtService jwtService) {
         this.jwtService = jwtService;
-        this.userDao = userDao;
     }
 
     @Override
@@ -35,12 +38,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String accessToken = jwtService.createAccessToken(userId);
         String refreshToken = jwtService.createRefreshToken();
 
-        jwtService.setHeaderAccessTokenRefreshToken(response, accessToken, refreshToken);
+        jwtService.checkUserId(userId).
+                ifPresent(user -> jwtService.updateRefreshToken(user, refreshToken));
 
-        userDao.findByUserId(userId)
-                .ifPresent(user -> {
-                    jwtService.updateRefreshToken(user, refreshToken);
-                });
+        //응답 설정
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader(accessHeader, accessToken);
+        response.setHeader(refreshHeader, refreshToken);
 
         log.info("로그인 성공 userId = {}", userId);
         log.info("로그인 성공 AccessToken = {}", accessToken);

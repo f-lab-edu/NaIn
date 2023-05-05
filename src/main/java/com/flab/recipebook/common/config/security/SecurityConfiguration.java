@@ -8,7 +8,6 @@ import com.flab.recipebook.common.handler.LoginFailHandler;
 import com.flab.recipebook.common.handler.LoginSuccessHandler;
 import com.flab.recipebook.common.service.JwtService;
 import com.flab.recipebook.common.service.LoginService;
-import com.flab.recipebook.user.domain.dao.UserDao;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -29,13 +28,11 @@ public class SecurityConfiguration {
 
     private final ObjectMapper objectMapper;
     private final JwtService jwtService;
-    private final UserDao userDao;
     private final LoginService loginService;
 
-    public SecurityConfiguration(ObjectMapper objectMapper, JwtService jwtService, UserDao userDao, LoginService loginService) {
+    public SecurityConfiguration(ObjectMapper objectMapper, JwtService jwtService, LoginService loginService) {
         this.objectMapper = objectMapper;
         this.jwtService = jwtService;
-        this.userDao = userDao;
         this.loginService = loginService;
     }
 
@@ -85,7 +82,7 @@ public class SecurityConfiguration {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userDao);
+        return new LoginSuccessHandler(jwtService);
     }
 
     /**
@@ -111,7 +108,7 @@ public class SecurityConfiguration {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter = new JwtAuthenticationProcessingFilter(jwtService, userDao);
+        JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter = new JwtAuthenticationProcessingFilter(jwtService);
         return jwtAuthenticationProcessingFilter;
     }
 
