@@ -3,18 +3,22 @@ package com.flab.recipebook.user.service;
 import com.flab.recipebook.user.domain.User;
 import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
+import com.flab.recipebook.user.dto.ResponseUserDto;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.dto.UpdateUserDto;
 import com.flab.recipebook.user.exception.DuplicateValueException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
     private final UserDao userDao;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserDao userDao) {
+    public UserService(UserDao userDao, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -34,8 +38,9 @@ public class UserService {
         userDao.update(makeUserFromUpdateUserDto(updateUserDto));
     }
 
-    public User findById(Long userNo){
-        return userDao.findById(userNo);
+    public ResponseUserDto findById(Long userNo){
+        User user = userDao.findById(userNo);
+        return convertResponseUserDto(user);
     }
 
     public void deleteById(Long userNo) {
@@ -53,7 +58,7 @@ public class UserService {
     public User makeUserFromSaveUserDto(SaveUserDto saveUserDto){
         return new User(
                 saveUserDto.getUserId(),
-                saveUserDto.getPassword(),
+                passwordEncoder(saveUserDto.getPassword()),
                 saveUserDto.getEmail(),
                 UserRole.USER
         );
@@ -68,10 +73,27 @@ public class UserService {
 
         return new User(
                 updateUserDto.getUserNo(),
-                password,
+                passwordEncoder(password),
                 updateUserDto.getEmail()
         );
     }
+
+    public ResponseUserDto convertResponseUserDto(User user){
+        return new ResponseUserDto(
+                user.getUserNo(),
+                user.getUserId(),
+                user.getPassword(),
+                user.getEmail(),
+                user.getUserRole(),
+                user.getCreateDate(),
+                user.getModifyDate()
+        );
+    }
+
+    private String passwordEncoder(String password){
+        return passwordEncoder.encode(password);
+    }
+
     private void checkUserId(String userId){
         if (existUserId(userId)) {
             throw new DuplicateValueException("아이디가 사용중 입니다.");
