@@ -1,6 +1,7 @@
 package com.flab.recipebook.common.advice;
 
 import com.flab.recipebook.common.dto.ResponseResult;
+import com.flab.recipebook.recipe.exception.RecipeNotFoundException;
 import com.flab.recipebook.user.exception.DuplicateValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ExceptionAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ResponseResult> exceptionMessageBinding(MethodArgumentNotValidException exception){
+    protected ResponseEntity<ResponseResult> MethodArgumentNotValidException(MethodArgumentNotValidException exception){
         List<String> errors = bindMultiErrors(exception);
         ResponseResult responseResult = new ResponseResult(errors);
 
@@ -24,11 +25,16 @@ public class ExceptionAdvice {
     }
 
     @ExceptionHandler(DuplicateValueException.class)
-    protected ResponseEntity<ResponseResult> RuntimeExceptionMessageBinding(DuplicateValueException exception){
+    protected ResponseEntity<ResponseResult> DuplicateValueException(DuplicateValueException exception){
         List<String> errors = bindSingleError(exception);
         ResponseResult responseResult = new ResponseResult(errors);
         
         return new ResponseEntity<>(responseResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RecipeNotFoundException.class)
+    protected ResponseEntity<ResponseResult> RecipeNotFoundException(RecipeNotFoundException exception) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     private List<String> bindMultiErrors(BindException exception){
