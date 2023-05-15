@@ -57,6 +57,7 @@ public class RecipeService {
         return new Recipe(
                 saveRecipeDto.getTitle(),
                 saveRecipeDto.getUserNo(),
+                saveRecipeDto.getRecipeType(),
                 saveRecipeDto.getContent());
     }
 
@@ -65,6 +66,7 @@ public class RecipeService {
         return new ResponseRecipeDto(
                 recipe.getRecipeId(),
                 recipe.getTitle(),
+                recipe.getRecipeType(),
                 recipe.getContent(),
                 recipe.getCreateDate(),
                 recipe.getModifyDate(),

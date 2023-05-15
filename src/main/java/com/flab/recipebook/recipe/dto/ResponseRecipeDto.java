@@ -1,20 +1,23 @@
 package com.flab.recipebook.recipe.dto;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 public class ResponseRecipeDto {
     private Long recipeId;
     private String title;
+    private List<String> recipeType;
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
     private String userId;
-    //재료
     //난이도
 
-    public ResponseRecipeDto(Long recipeId, String title, String content, LocalDateTime createDate, LocalDateTime modifyDate, String userId) {
+    public ResponseRecipeDto(Long recipeId, String title, String recipeType, String content, LocalDateTime createDate, LocalDateTime modifyDate, String userId) {
         this.recipeId = recipeId;
         this.title = title;
+        this.recipeType = setRecipeType(recipeType);
         this.content = content;
         this.createDate = createDate;
         this.modifyDate = modifyDate;
@@ -35,6 +38,18 @@ public class ResponseRecipeDto {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public List<String> getRecipeType() {
+        return recipeType;
+    }
+
+    public List<String> setRecipeType(String recipeType) {
+        if (recipeType == null) {
+            return null;
+        }
+        String[] typeList = recipeType.split(",");
+        return Arrays.asList(typeList);
     }
 
     public String getContent() {

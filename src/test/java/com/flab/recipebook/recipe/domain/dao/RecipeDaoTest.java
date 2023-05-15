@@ -37,7 +37,7 @@ class RecipeDaoTest {
         userDao.save(saveUser);
         User user = userDao.findByUserId("test").orElse(null);
 
-        Recipe recipe = new Recipe(1L, "RecipeTitle", user.getUserNo(), "RecipeContent 입니다.", LocalDateTime.now(), LocalDateTime.now());
+        Recipe recipe = new Recipe(1L, "RecipeTitle", user.getUserNo(), "type1, type2" , "RecipeContent 입니다.", LocalDateTime.now(), LocalDateTime.now());
         recipeDao.save(recipe);
 
         Recipe findRecipe = recipeDao.findById(1L).get();
@@ -54,8 +54,8 @@ class RecipeDaoTest {
         userDao.save(user1);
         userDao.save(user2);
 
-        Recipe recipe1 = new Recipe(1L, "Title1", user1.getUserNo(), "content1 입니다.", LocalDateTime.now(), LocalDateTime.now());
-        Recipe recipe2 = new Recipe(2L, "Title2", user2.getUserNo(), "content2 입니다.", LocalDateTime.now(), LocalDateTime.now());
+        Recipe recipe1 = new Recipe(1L, "Title1", user1.getUserNo(), "type1, type2", "content1 입니다.", LocalDateTime.now(), LocalDateTime.now());
+        Recipe recipe2 = new Recipe(2L, "Title2", user2.getUserNo(), "type1, type2", "content2 입니다.", LocalDateTime.now(), LocalDateTime.now());
 
         recipeDao.save(recipe1);
         recipeDao.save(recipe2);

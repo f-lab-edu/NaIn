@@ -48,8 +48,8 @@ class RecipeServiceTest {
         User user1 = new User(1L, "User1", "abc1234!@#", "jm.naver.com", UserRole.USER, LocalDateTime.now(), LocalDateTime.now(), null);
         User user2 = new User(2L, "User2", "abc1234!@#", "kim.naver.com", UserRole.USER, LocalDateTime.now(), LocalDateTime.now(), null);
 
-        Recipe recipe1 = new Recipe(1L, "Title1", 1L, "content1 입니다.", LocalDateTime.now(), LocalDateTime.now());
-        Recipe recipe2 = new Recipe(2L, "Title2", 2L, "content2 입니다.", LocalDateTime.now(), LocalDateTime.now());
+        Recipe recipe1 = new Recipe(1L, "Title1", 1L, "type1, type2", "content1 입니다.", LocalDateTime.now(), LocalDateTime.now());
+        Recipe recipe2 = new Recipe(2L, "Title2", 2L, "type1, type2", "content2 입니다.", LocalDateTime.now(), LocalDateTime.now());
 
         List<Recipe> recipeList = new ArrayList<>();
         recipeList.add(recipe1);
