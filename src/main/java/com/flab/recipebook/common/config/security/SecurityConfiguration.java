@@ -24,8 +24,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 /**
  * SpringSecurity 활성화
  */
-@Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     private final ObjectMapper objectMapper;
