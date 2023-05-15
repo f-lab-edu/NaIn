@@ -9,6 +9,7 @@ import com.flab.recipebook.common.handler.LoginSuccessHandler;
 import com.flab.recipebook.common.service.JwtService;
 import com.flab.recipebook.common.service.LoginService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,7 +24,8 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 /**
  * SpringSecurity 활성화
  */
-@EnableWebSecurity
+@Configuration
+@EnableWebSecurity(debug = true)
 public class SecurityConfiguration {
 
     private final ObjectMapper objectMapper;
@@ -49,14 +51,14 @@ public class SecurityConfiguration {
 
                 .and()
                 .authorizeRequests()
-                //권한 설정
+//                //권한 설정
                 .antMatchers("/", "/login", "/signup").permitAll()
                 .anyRequest().authenticated();
 
         //순서 설정 LogoutFilter(스프링) -> jwtExceptionFilter -> jwtAuthenticationProcessFilter -> JsonUsernamePasswordAuthenticationFilter
-        http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-        http.addFilterBefore(jwtAuthenticationProcessingFilter(), JsonUsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(jwtExceptionFilter(), JwtAuthenticationProcessingFilter.class);
+        http.addFilterAfter(jwtExceptionFilter(), LogoutFilter.class);
+        http.addFilterAfter(jwtAuthenticationProcessingFilter(), JwtExceptionFilter.class);
+        http.addFilterAfter(jsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class);
 
         return http.build();
     }
@@ -80,7 +82,7 @@ public class SecurityConfiguration {
     /**
      * 로그인 성공 핸들러
      */
-    @Bean
+//    @Bean
     public LoginSuccessHandler loginSuccessHandler() {
         return new LoginSuccessHandler(jwtService);
     }
@@ -88,6 +90,7 @@ public class SecurityConfiguration {
     /**
      * 로그인 실패 핸들러
      */
+//    @Bean
     public LoginFailHandler loginFailHandler() {
         return new LoginFailHandler();
     }

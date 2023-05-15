@@ -84,10 +84,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         //RefreshToken 이 없고, AcessToken 이 유효한 경우
         if (refreshToken == null) {
             log.info("AccessToken 요청 : {}", request.getHeader(accessHeader));
+            String accessToken = request.getHeader(accessHeader);
 
-            //요청에서 AccessToken 검증 후 userId 추출
-            String userId = jwtService.extractUserId(request.getHeader(accessHeader));
-            jwtService.checkUserId(userId).ifPresent(user -> saveAuthentication(user));
+            if (accessToken != null) {
+                //요청에서 AccessToken 검증 후 userId 추출
+                String userId = jwtService.extractUserId(accessToken);
+                jwtService.checkUserId(userId).ifPresent(user -> saveAuthentication(user));
+            }
 
             filterChain.doFilter(request, response);
         }
