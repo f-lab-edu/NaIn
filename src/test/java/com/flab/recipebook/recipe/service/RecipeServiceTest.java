@@ -98,7 +98,11 @@ class RecipeServiceTest {
         User user = new User(1L, "User1", "abc1234!@#", "jm@naver.com", UserRole.CHEF, LocalDateTime.now(), LocalDateTime.now(), null);
         when(userDao.findById(1L)).thenReturn(Optional.of(user));
 
-        SaveRecipeDto saveRecipeDto = new SaveRecipeDto("Title", user.getUserNo(), "content 입니다.");
+        List<String> recipeType = new ArrayList<>();
+        recipeType.add("type1");
+        recipeType.add("type2");
+
+        SaveRecipeDto saveRecipeDto = new SaveRecipeDto("Title", user.getUserNo(), recipeType ,"content 입니다.");
 
         recipeService.saveRecipe(saveRecipeDto);
         verify(recipeDao, times(1)).save(any(Recipe.class));
@@ -110,7 +114,11 @@ class RecipeServiceTest {
         User user = new User(1L, "User1", "abc1234!@#", "jm@naver.com", UserRole.USER, LocalDateTime.now(), LocalDateTime.now(), null);
         when(userDao.findById(1L)).thenReturn(Optional.of(user));
 
-        SaveRecipeDto saveRecipeDto = new SaveRecipeDto("Title", user.getUserNo(), "content 입니다.");
+        List<String> recipeType = new ArrayList<>();
+        recipeType.add("type1");
+        recipeType.add("type2");
+
+        SaveRecipeDto saveRecipeDto = new SaveRecipeDto("Title", user.getUserNo(), recipeType, "content 입니다.");
 
         assertThrows(AccessDeniedException.class, () -> recipeService.saveRecipe(saveRecipeDto));
     }

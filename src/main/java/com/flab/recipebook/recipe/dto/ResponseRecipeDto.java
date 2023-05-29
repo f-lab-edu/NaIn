@@ -17,7 +17,7 @@ public class ResponseRecipeDto {
     public ResponseRecipeDto(Long recipeId, String title, String recipeType, String content, LocalDateTime createDate, LocalDateTime modifyDate, String userId) {
         this.recipeId = recipeId;
         this.title = title;
-        this.recipeType = setRecipeType(recipeType);
+        this.recipeType = convertRecipeType(recipeType);
         this.content = content;
         this.createDate = createDate;
         this.modifyDate = modifyDate;
@@ -44,7 +44,7 @@ public class ResponseRecipeDto {
         return recipeType;
     }
 
-    public List<String> setRecipeType(String recipeType) {
+    private List<String> convertRecipeType(String recipeType) {
         if (recipeType == null) {
             return null;
         }

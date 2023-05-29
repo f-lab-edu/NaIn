@@ -10,9 +10,10 @@ public class SaveRecipeDto {
     //난이도
     private String content;
 
-    public SaveRecipeDto(String title, Long userNo, String content) {
+    public SaveRecipeDto(String title, Long userNo, List<String> recipeType, String content) {
         this.title = title;
         this.userNo = userNo;
+        this.recipeType = convertRecipeType(recipeType);
         this.content = content;
     }
 
@@ -32,11 +33,10 @@ public class SaveRecipeDto {
         return recipeType;
     }
 
-    public void setRecipeType(List<String> recipeType) {
+    private String convertRecipeType(List<String> recipeType) {
         if (recipeType == null || recipeType.isEmpty()) {
-            this.recipeType = null;
-            return;
+            return null;
         }
-        this.recipeType = String.join(",", recipeType);
+        return String.join(",", recipeType);
     }
 }
