@@ -84,7 +84,7 @@ class UserDaoTest {
 
         //when
         userDao.update(modifyUser);
-        User resultUser = userDao.findById(1L);
+        User resultUser = userDao.findById(1L).get();
 
         //then
         assertThat(resultUser.getPassword()).isEqualTo(modifyUser.getPassword());
