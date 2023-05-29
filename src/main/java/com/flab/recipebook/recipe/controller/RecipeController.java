@@ -2,6 +2,7 @@ package com.flab.recipebook.recipe.controller;
 
 import com.flab.recipebook.common.dto.ResponseResult;
 import com.flab.recipebook.recipe.dto.SaveRecipeDto;
+import com.flab.recipebook.recipe.dto.SearchRecipeDto;
 import com.flab.recipebook.recipe.service.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,8 @@ public class RecipeController {
         return new ResponseEntity<>(new ResponseResult(recipeService.findById(recipeId)), HttpStatus.OK);
     }
 
-    @GetMapping("/recipe/search/{title}")
-    public ResponseEntity<ResponseResult> findByTitle(@PathVariable String title) {
-        return new ResponseEntity<>(new ResponseResult(recipeService.findByTitle(title)), HttpStatus.OK);
+    @GetMapping("/recipe/search")
+    public ResponseEntity<ResponseResult> findByKeyword(@RequestBody SearchRecipeDto searchRecipeDto) {
+        return new ResponseEntity<>(new ResponseResult(recipeService.findByKeyword(searchRecipeDto)), HttpStatus.OK);
     }
 }

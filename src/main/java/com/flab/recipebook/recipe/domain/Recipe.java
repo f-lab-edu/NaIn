@@ -1,31 +1,36 @@
 package com.flab.recipebook.recipe.domain;
 
+import com.flab.recipebook.user.domain.User;
+
 import java.time.LocalDateTime;
 
 public class Recipe {
     private Long recipeId;
     private String title;
-    private Long userNo;
-    //분야
+    private User user;
     private String recipeType;
     //난이도
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime modifyDate;
 
-    public Recipe(String title, Long userNo, String recipeType, String content) {
+    public Recipe() {
+
+    }
+
+    public Recipe(String title, User user, String recipeType, String content) {
         this.title = title;
-        this.userNo = userNo;
+        this.user = user;
         this.recipeType = recipeType;
         this.content = content;
         this.createDate = LocalDateTime.now();
         this.modifyDate = LocalDateTime.now();
     }
 
-    public Recipe(Long recipeId, String title, Long user, String recipeType, String content, LocalDateTime createDate, LocalDateTime modifyDate) {
+    public Recipe(Long recipeId, String title, User user, String recipeType, String content, LocalDateTime createDate, LocalDateTime modifyDate) {
         this.recipeId = recipeId;
         this.title = title;
-        this.userNo = user;
+        this.user = user;
         this.recipeType = recipeType;
         this.content = content;
         this.createDate = createDate;
@@ -44,12 +49,12 @@ public class Recipe {
         this.title = title;
     }
 
-    public Long getUserNo() {
-        return userNo;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserNo(Long userNo) {
-        this.userNo = userNo;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getContent() {
@@ -82,5 +87,28 @@ public class Recipe {
 
     public void setRecipeType(String recipeType) {
         this.recipeType = recipeType;
+    }
+
+    //@TODO 삭제예정 (내부 확인용)
+    @Override
+    public String toString() {
+        return "Recipe{\n" +
+                "recipeId = " + recipeId + ", \n" +
+                "title = " + title + ", \n" +
+                "user = {\n" +
+                "   userNo = " + user.getUserNo() + ",\n" +
+                "   userId = " + user.getUserId() + ",\n" +
+                "   password = " + user.getPassword() + ",\n" +
+                "   email = " + user.getEmail() + ",\n" +
+                "   userRole = " + user.getUserRole() + ",\n" +
+                "   createDate = " + user.getCreateDate() + ",\n" +
+                "   modifyDate = " + user.getModifyDate() + ",\n" +
+                "   refreshToken = " + user.getRefreshToken() + ",\n" +
+                "   }\n" +
+                "recipeType = " + recipeType + ", \n" +
+                "content = " + content + ", \n" +
+                "createDate = " + createDate + ", \n" +
+                "modifyDate = " + modifyDate + ", \n" +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
 package com.flab.recipebook.recipe.domain.dao;
 
 import com.flab.recipebook.recipe.domain.Recipe;
+import com.flab.recipebook.recipe.dto.SearchRecipeDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -14,5 +15,5 @@ public interface RecipeDao {
 
     Optional<Recipe> findById(Long id);
 
-    List<Recipe> findByTitle(String title);
+    List<Recipe> findByKeyword(SearchRecipeDto searchRecipeDto);
 }

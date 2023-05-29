@@ -4,9 +4,13 @@ import com.flab.recipebook.recipe.domain.Recipe;
 import com.flab.recipebook.recipe.domain.dao.RecipeDao;
 import com.flab.recipebook.recipe.dto.ResponseRecipeDto;
 import com.flab.recipebook.recipe.dto.SaveRecipeDto;
+import com.flab.recipebook.recipe.dto.SearchRecipeDto;
+import com.flab.recipebook.recipe.exception.AccessDeniedException;
 import com.flab.recipebook.recipe.exception.RecipeNotFoundException;
 import com.flab.recipebook.user.domain.User;
+import com.flab.recipebook.user.domain.UserRole;
 import com.flab.recipebook.user.domain.dao.UserDao;
+import com.flab.recipebook.user.exception.NotFoundUserException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +33,7 @@ public class RecipeService {
      * 레시피에는 제목, 재료, 내용을 작성할 수 있다.
      */
     public void saveRecipe(SaveRecipeDto saveRecipeDto) {
-        //권한 검증
-        //recipe 변환
+        //권한 검증 && recipe 변환
         Recipe recipe = makeRecipeFromSaveRecipeDto(saveRecipeDto);
         //recipe 저장
         recipeDao.save(recipe);
@@ -41,11 +44,10 @@ public class RecipeService {
      * 레시피는 기본적으로 최근 등록순으로 정렬되어서 조회 된다.
      * 레시피 메인 검색은 제목에 포함된 문자열을 찾아 조회 된다.
      */
-    public List<ResponseRecipeDto> findByTitle(String title) {
-        return recipeDao.findByTitle(title).stream().map(
-                recipe -> {
-                    return convertResponseRecipe(recipe);
-                }).collect(Collectors.toList());
+    public List<ResponseRecipeDto> findByKeyword(SearchRecipeDto searchRecipeDto) {
+        //작성자 일 때 아이디 찾기
+        return recipeDao.findByKeyword(searchRecipeDto).stream().map(
+                recipe -> convertResponseRecipe(recipe)).collect(Collectors.toList());
     }
 
     /**
@@ -55,20 +57,28 @@ public class RecipeService {
      * 레시피 상세 조회를 하면 별점을 남길 수 있다. (별점기능 추가 후)
      */
     public ResponseRecipeDto findById(Long id) {
-        Recipe recipe = recipeDao.findById(id).orElseThrow(RecipeNotFoundException::new);
+        Recipe recipe = recipeDao.findById(id).orElseThrow(() -> new RecipeNotFoundException("레시피를 찾을 수 없습니다"));
         return convertResponseRecipe(recipe);
     }
 
     public Recipe makeRecipeFromSaveRecipeDto(SaveRecipeDto saveRecipeDto) {
+        User user = checkUserRole(saveRecipeDto.getUserNo());
         return new Recipe(
                 saveRecipeDto.getTitle(),
-                saveRecipeDto.getUserNo(),
+                user,
                 saveRecipeDto.getRecipeType(),
                 saveRecipeDto.getContent());
     }
 
+    private User checkUserRole(Long userNo) {
+        User user = userDao.findById(userNo).orElseThrow(() -> new NotFoundUserException("유저를 찾을 수 없습니다."));
+        if (user == null || !user.getUserRole().equals(UserRole.CHEF)) {
+            throw new AccessDeniedException("권한이 없는 계정입니다.");
+        }
+        return user;
+    }
+
     public ResponseRecipeDto convertResponseRecipe(Recipe recipe) {
-        User user = userDao.findById(recipe.getUserNo());
         return new ResponseRecipeDto(
                 recipe.getRecipeId(),
                 recipe.getTitle(),
@@ -76,7 +86,7 @@ public class RecipeService {
                 recipe.getContent(),
                 recipe.getCreateDate(),
                 recipe.getModifyDate(),
-                user.getUserId()
+                recipe.getUser().getUserId()
         );
     }
 }
