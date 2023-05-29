@@ -32,4 +32,9 @@ public class RecipeController {
     public ResponseEntity<ResponseResult> findByKeyword(@RequestBody SearchRecipeDto searchRecipeDto) {
         return new ResponseEntity<>(new ResponseResult(recipeService.findByKeyword(searchRecipeDto)), HttpStatus.OK);
     }
+
+    @GetMapping("/recipe/search/all")
+    public ResponseEntity<ResponseResult> findAll() {
+        return new ResponseEntity<>(new ResponseResult(recipeService.findAll()), HttpStatus.OK);
+    }
 }

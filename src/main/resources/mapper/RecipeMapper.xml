@@ -60,6 +60,24 @@
         ;
     </select>
 
+    <select id="findAll" resultMap="responseRecipe">
+        SELECT r.recipe_id,
+               r.title,
+               r.recipe_type,
+               r.content,
+               r.create_date,
+               r.modify_date,
+               u.user_no,
+               u.user_id,
+               u.password,
+               u.email,
+               u.user_role,
+               u.create_date as u_create_date,
+               u.modify_date as u_modify_date
+        from Recipe r
+                 LEFT JOIN users u ON (r.user_no = u.user_no)
+    </select>
+
     <insert id="save" parameterType="Recipe">
         INSERT
         INTO Recipe (recipe_id,

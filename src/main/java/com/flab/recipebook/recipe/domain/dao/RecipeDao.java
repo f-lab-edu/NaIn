@@ -16,4 +16,6 @@ public interface RecipeDao {
     Optional<Recipe> findById(Long id);
 
     List<Recipe> findByKeyword(SearchRecipeDto searchRecipeDto);
+
+    List<Recipe> findAll();
 }

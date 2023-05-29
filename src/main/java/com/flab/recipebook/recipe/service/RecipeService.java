@@ -51,6 +51,15 @@ public class RecipeService {
     }
 
     /**
+     * 레시피를 전체 조회한다.
+     * 모든 사용자가 이용 가능하다.
+     */
+    public List<ResponseRecipeDto> findAll() {
+        return recipeDao.findAll().stream().map(
+                recipe -> convertResponseRecipe(recipe)).collect(Collectors.toList());
+    }
+
+    /**
      * 레시피 상세
      * 검색된 레시피를 클릭하면 상세한 내용을 볼 수 있다.
      * 레시피 상세 조회를 하면 댓글을 남길 수 있다. (댓글기능 추가 후)
