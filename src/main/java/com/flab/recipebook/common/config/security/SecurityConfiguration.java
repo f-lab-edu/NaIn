@@ -8,8 +8,8 @@ import com.flab.recipebook.common.handler.LoginFailHandler;
 import com.flab.recipebook.common.handler.LoginSuccessHandler;
 import com.flab.recipebook.common.service.JwtService;
 import com.flab.recipebook.common.service.LoginService;
+import com.flab.recipebook.user.domain.UserRole;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -51,7 +51,9 @@ public class SecurityConfiguration {
                 .and()
                 .authorizeRequests()
 //                //권한 설정
-                .antMatchers("/", "/login", "/signup").permitAll()
+                .antMatchers("/", "/login", "/signup", "/recipe/search/**").permitAll()
+                .antMatchers("/recipe/**").hasRole(UserRole.CHEF.name())
+                .antMatchers("/users/profile/**").hasAnyRole(UserRole.USER.name(), UserRole.CHEF.name())
                 .anyRequest().authenticated();
 
         //순서 설정 LogoutFilter(스프링) -> jwtExceptionFilter -> jwtAuthenticationProcessFilter -> JsonUsernamePasswordAuthenticationFilter
