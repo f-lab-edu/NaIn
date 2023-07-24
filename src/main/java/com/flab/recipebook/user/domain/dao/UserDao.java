@@ -1,7 +1,6 @@
 package com.flab.recipebook.user.domain.dao;
 
 import com.flab.recipebook.user.domain.User;
-import com.flab.recipebook.user.dto.UpdateUserDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +11,7 @@ import java.util.Optional;
 public interface UserDao {
     void save(User user);
     void update(User user);
-    User findById(Long userNo);
+    Optional<User> findById(Long userNo);
     Optional<User> findByUserId(String userId);
     Optional<User> findByRefreshToken(String refreshToken);
     void updateRefreshToken(User user);

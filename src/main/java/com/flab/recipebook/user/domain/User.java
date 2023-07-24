@@ -13,6 +13,10 @@ public class User {
     private LocalDateTime modifyDate;
     private String refreshToken;
 
+    public User() {
+
+    }
+
     public User(Long userNo, String password, String email) {
         this.userNo = userNo;
         this.password = password;

@@ -7,6 +7,7 @@ import com.flab.recipebook.user.dto.ResponseUserDto;
 import com.flab.recipebook.user.dto.SaveUserDto;
 import com.flab.recipebook.user.dto.UpdateUserDto;
 import com.flab.recipebook.user.exception.DuplicateValueException;
+import com.flab.recipebook.user.exception.NotFoundUserException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +40,7 @@ public class UserService {
     }
 
     public ResponseUserDto findById(Long userNo){
-        User user = userDao.findById(userNo);
+        User user = vaildateUser(userNo);;
         return convertResponseUserDto(user);
     }
 
@@ -106,10 +107,15 @@ public class UserService {
     }
 
     private void checkPassword(UpdateUserDto updateUserDto) {
-        String currentPassword = userDao.findById(updateUserDto.getUserNo()).getPassword();
+        User user = vaildateUser(updateUserDto.getUserNo());
+        String currentPassword = user.getPassword();
 
         if (currentPassword.equals(updateUserDto.getCurrentPassword())) {
             throw new IllegalStateException("패스워드가 일치하지 않습니다.");
         }
+    }
+
+    private User vaildateUser(Long userNo) {
+        return userDao.findById(userNo).orElseThrow(() -> new NotFoundUserException("유저를 찾을 수 없습니다."));
     }
 }

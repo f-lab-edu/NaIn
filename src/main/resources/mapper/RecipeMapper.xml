@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flab.recipebook.recipe.domain.dao.RecipeDao">
+    <resultMap id="responseRecipe" type="Recipe">
+        <id property="recipeId" column="recipe_id"/>
+        <result property="title" column="title"/>
+        <result property="recipeType" column="recipe_type"/>
+        <result property="content" column="content"/>
+        <result property="createDate" column="create_date"/>
+        <result property="modifyDate" column="modify_date"/>
+        <association property="user" javaType="User">
+            <id property="userNo" column="user_no"/>
+            <result property="userId" column="user_id"/>
+            <result property="password" column="password"/>
+            <result property="email" column="email"/>
+            <result property="userRole" column="user_role"/>
+            <result property="createDate" column="u_create_date"/>
+            <result property="modifyDate" column="u_modify_date"/>
+        </association>
+    </resultMap>
+
+    <select id="findById" parameterType="Long" resultMap="responseRecipe">
+        SELECT r.recipe_id,
+               r.title,
+               r.recipe_type,
+               r.content,
+               r.create_date,
+               r.modify_date,
+               u.user_no,
+               u.user_id,
+               u.password,
+               u.email,
+               u.user_role,
+               u.create_date as u_create_date,
+               u.modify_date as m_modify_date
+        from Recipe r
+             LEFT JOIN users u ON (r.user_no = u.user_no)
+        WHERE r.recipe_id = #{recipeId}
+        ;
+    </select>
+
+    <select id="findByKeyword" parameterType="SearchRecipeDto" resultMap="responseRecipe">
+        SELECT r.recipe_id,
+               r.title,
+               r.recipe_type,
+               r.content,
+               r.create_date,
+               r.modify_date,
+               u.user_no,
+               u.user_id,
+               u.password,
+               u.email,
+               u.user_role,
+               u.create_date as u_create_date,
+               u.modify_date as u_modify_date
+        from Recipe r
+            LEFT JOIN users u ON (r.user_no = u.user_no)
+        WHERE 1=1
+        <include refid="search"></include>
+        ;
+    </select>
+
+    <select id="findAll" resultMap="responseRecipe">
+        SELECT r.recipe_id,
+               r.title,
+               r.recipe_type,
+               r.content,
+               r.create_date,
+               r.modify_date,
+               u.user_no,
+               u.user_id,
+               u.password,
+               u.email,
+               u.user_role,
+               u.create_date as u_create_date,
+               u.modify_date as u_modify_date
+        from Recipe r
+                 LEFT JOIN users u ON (r.user_no = u.user_no)
+    </select>
+
+    <insert id="save" parameterType="Recipe">
+        INSERT
+        INTO Recipe (recipe_id,
+                     title,
+                     user_no,
+                     recipe_type,
+                     content,
+                     create_date,
+                     modify_date)
+        VALUES (#{recipeId},
+                #{title},
+                #{user.userNo},
+                #{recipeType},
+                #{content},
+                #{createDate},
+                #{modifyDate})
+    </insert>
+
+    <sql id="search">
+        <if test="searchType != null">
+            <if test="searchType == 't'.toString()">AND TITLE LIKE CONCAT('%', #{keyword}, '%') </if>
+            <if test="searchType == 'c'.toString()">AND CONTENT LIKE CONCAT('%', #{keyword}, '%') </if>
+            <if test="searchType == 'w'.toString()">AND USER_ID LIKE CONCAT('%', #{keyword}, '%') </if>
+            <if test="searchType == 'tc'.toString()">AND (TITLE LIKE CONCAT('%', #{keyword}, '%')  OR CONTENT LIKE CONCAT('%', #{keyword}, '%'))</if>
+        </if>
+    </sql>
+</mapper>
